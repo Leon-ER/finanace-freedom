@@ -9,9 +9,6 @@ interface RegisterInput {
 }
 
 export async function register(data: RegisterInput) {
-  if (data == null) {
-    return "Register data can't be empty";
-  }
   try {
     const res = await axiosInstance.post("/auth/register", {
       fullName: data.fullName,
