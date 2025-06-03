@@ -10,7 +10,6 @@ export function middleware(request) {
     //         new URL('/', req.url)
     //     )
     // }
-
     return NextResponse.next();
 }
 
