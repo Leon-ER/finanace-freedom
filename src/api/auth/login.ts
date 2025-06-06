@@ -1,44 +1,54 @@
 import axiosInstance from "@/lib/axios/axios";
+import { useDispatch} from "react-redux";
+import { setUser } from "@/lib/redux/userSlice";
 
-export async function login(
-  email: string,
-  password: string,
-  rememberMe: boolean
-) {
-  if (!email || !password) {
-    return "Email or password can't be null";
-  }
+export function useLogin() {
+  const dispatch = useDispatch();
 
-  try {
-    const res = await axiosInstance.post("/auth/login", {
-      email,
-      password,
-      rememberMe,
-    });
+  const login = async (
+    email: string,
+    password: string,
+    rememberMe: boolean
+  ) => {
+    if (!email || !password) {
+      return "Email or password can't be null";
+    }
 
-    const {
-      accessToken,
-      userId,
-      username,
-      email: userEmail,
-      expiresAt,
-    } = res.data;
+    try {
+      const res = await axiosInstance.post("/auth/login", {
+        email,
+        password,
+        rememberMe,
+      });
 
-    localStorage.setItem("accessToken", accessToken);
-
-    return {
-      message: "Login successful",
-      user: {
+      const {
+        accessToken,
         userId,
         username,
         email: userEmail,
         expiresAt,
-      },
-    };
-  } catch (error: any) {
-    return {
-      message: error?.response?.data?.message || "Login failed",
-      success: false,
-    };
-  }
+      } = res.data;
+
+      localStorage.setItem("accessToken", accessToken);
+
+      dispatch(setUser({ userId, username, email: userEmail }));
+
+      return {
+        message: "Login successful",
+        user: {
+          userId,
+          username,
+          email: userEmail,
+          expiresAt,
+        },
+      };
+    } catch (error: any) {
+      return {
+        message: error?.response?.data?.message || "Login failed",
+        success: false,
+      };
+    }
+  };
+
+  return {login}
 }
